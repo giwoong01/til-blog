@@ -28,6 +28,15 @@ export type AppTheme = {
     sm: string;
     md: string;
   };
+  syntax: {
+    keyword: string;
+    string: string;
+    number: string;
+    title: string;
+    type: string;
+    meta: string;
+    comment: string;
+  };
 };
 
 const common = {
@@ -62,6 +71,15 @@ export const lightTheme: AppTheme = {
     codeText: "#0b1220",
   },
   ...common,
+  syntax: {
+    keyword: "#7c3aed",
+    string: "#059669",
+    number: "#b45309",
+    title: "#2563eb",
+    type: "#16a34a",
+    meta: "#db2777",
+    comment: "#6b7280",
+  },
 };
 
 export const darkTheme: AppTheme = {
@@ -74,11 +92,20 @@ export const darkTheme: AppTheme = {
     surface: "#111827",
     chip: "#1f2530",
     knobBg: "#0b1220",
-    codeBg: "#0f172a",
-    codeText: "#e5e7eb",
+
+    codeBg: "#282c34",
+    codeText: "#abb2bf",
   },
   ...common,
+  syntax: {
+    keyword: "#c678dd",
+    string: "#98c379",
+    number: "#d19a66",
+    title: "#61afef",
+    type: "#e5c07b",
+    meta: "#56b6c2",
+    comment: "#5c6370",
+  },
 };
 
-// Backward compatibility default
 export const theme = lightTheme;

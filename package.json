@@ -14,6 +14,8 @@
   "dependencies": {
     "buffer": "^6.0.3",
     "gray-matter": "^4.0.3",
+    "rehype-highlight": "^7.0.0",
+    "highlight.js": "^11.9.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-markdown": "^10.1.0",

@@ -2,6 +2,7 @@ import { useMemo, type ReactNode, useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
 import styled from "styled-components";
 import { usePosts } from "../posts/usePosts";
 
@@ -141,7 +142,11 @@ export default function TILView() {
           ))}
         </Tags>
         <Article>
-          <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeHighlight]}
+            components={components}
+          >
             {post.content}
           </ReactMarkdown>
         </Article>

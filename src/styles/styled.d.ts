@@ -29,5 +29,14 @@ declare module "styled-components" {
       sm: string;
       md: string;
     };
+    syntax: {
+      keyword: string;
+      string: string;
+      number: string;
+      title: string;
+      type: string;
+      meta: string;
+      comment: string;
+    };
   }
 }

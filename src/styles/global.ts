@@ -19,4 +19,21 @@ export const GlobalStyle = createGlobalStyle`
   h2 { font-size: 28px; margin: 18px 0 10px; }
   h3 { font-size: 20px; margin: 14px 0 8px; }
   p { margin: 0 0 12px; }
+  /* highlight.js 색상을 테마 토큰으로 지정 */
+  pre code.hljs {
+    display: block;
+    overflow-x: auto;
+  }
+  .hljs-comment, .hljs-quote { color: ${({ theme }) => theme.syntax.comment}; }
+  .hljs-keyword, .hljs-selector-tag, .hljs-subst { color: ${({ theme }) =>
+    theme.syntax.keyword}; }
+  .hljs-string { color: ${({ theme }) => theme.syntax.string}; }
+  .hljs-title, .hljs-name { color: ${({ theme }) => theme.syntax.title}; }
+  .hljs-type { color: ${({ theme }) => theme.syntax.type}; }
+  .hljs-number, .hljs-literal, .hljs-symbol, .hljs-bullet { color: ${({
+    theme,
+  }) => theme.syntax.number}; }
+  .hljs-section, .hljs-attribute, .hljs-built_in { color: ${({ theme }) =>
+    theme.syntax.title}; }
+  .hljs-meta { color: ${({ theme }) => theme.syntax.meta}; }
 `;
