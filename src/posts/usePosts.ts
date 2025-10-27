@@ -46,7 +46,11 @@ export function usePosts() {
         const bd = b.frontmatter.date
           ? new Date(b.frontmatter.date).getTime()
           : 0;
-        return bd - ad;
+        if (bd !== ad) return bd - ad;
+        const ai = extractDailyIndex(a.slug);
+        const bi = extractDailyIndex(b.slug);
+        if (bi !== ai) return bi - ai;
+        return b.slug.localeCompare(a.slug);
       });
       setPosts(loaded);
     })();
@@ -77,4 +81,12 @@ function normalizeFrontmatter(data: unknown): FrontMatter {
     date: dateStr,
     tags,
   };
+}
+
+function extractDailyIndex(slug: string): number {
+  const name = slug.split("/").pop() || slug;
+  const m = name.match(/^(\d{4}-\d{2}-\d{2})(?:-(\d+))?$/);
+  if (m && m[2]) return parseInt(m[2], 10) || 0;
+  const tail = name.match(/-(\d+)$/);
+  return tail ? parseInt(tail[1], 10) || 0 : 0;
 }

@@ -174,10 +174,26 @@ const CardLink = styled(Link)`
 `;
 const CardTitle = styled.h3`
   margin: 0 0 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  line-height: 1.4;
+  min-height: calc(1.4em * 2);
 `;
 const CardDesc = styled.p`
   margin: 0;
   color: ${({ theme }) => theme.colors.subtleText};
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  line-height: 1.5;
+  min-height: calc(1.5em * 2);
 `;
 const Tags = styled.div`
   margin-top: 8px;

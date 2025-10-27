@@ -174,7 +174,7 @@ const Wrap = styled.div`
 
 const MainCol = styled.div`
   max-width: 720px;
-  padding-left: 16px;
+  min-width: 0;
 `;
 
 const Back = styled(Link)`
@@ -183,6 +183,8 @@ const Back = styled(Link)`
 const Title = styled.h1`
   margin-top: 8px;
   font-size: 40px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
   ${({ theme }) => theme.mq.sm} {
     font-size: 32px;
   }
