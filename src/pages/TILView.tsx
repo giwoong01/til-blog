@@ -240,6 +240,22 @@ const Article = styled.article`
     border-radius: 8px;
     overflow: auto;
   }
+  /* tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+  }
+  th,
+  td {
+    border: 1px solid ${({ theme }) => theme.colors.border};
+    padding: 8px 12px;
+  }
+  th {
+    text-align: left;
+    font-weight: 600;
+    background: ${({ theme }) => theme.colors.chip};
+  }
 `;
 
 const TocCol = styled.aside`
