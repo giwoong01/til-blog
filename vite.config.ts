@@ -19,7 +19,7 @@ export default defineConfig({
         background_color: "#ffffff",
         theme_color: "#121212",
         icons: [
-          {데
+          {
             src: "src/assets/til-favicon.svg",
             sizes: "any",
             type: "image/svg+xml",
