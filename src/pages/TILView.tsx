@@ -128,6 +128,14 @@ export default function TILView() {
     h2: makeHeading("h2"),
     h3: makeHeading("h3"),
     h4: makeHeading("h4"),
+    img: (props: React.ImgHTMLAttributes<HTMLImageElement>) => {
+      const raw = props.src || "";
+      const base = import.meta.env.BASE_URL || "/";
+      const normalized = raw.startsWith("/")
+        ? base + raw.replace(/^\//, "")
+        : raw;
+      return <img {...props} src={normalized} loading="lazy" />;
+    },
   } as const;
 
   return (
@@ -225,6 +233,12 @@ const Article = styled.article`
   h3 {
     margin-top: 18px;
     margin-bottom: 6px;
+  }
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 12px auto;
   }
   pre,
   code {
