@@ -20,10 +20,7 @@ export const getTextFromChildren = (children: ReactNode): string => {
     return children.map(getTextFromChildren).join("");
   if (children && typeof children === "object" && "props" in children)
     return getTextFromChildren(
-      (children as any as { props: { children: ReactNode } }).props.children
+      (children as { props: { children: ReactNode } }).props.children
     );
   return "";
 };
-
-
-
