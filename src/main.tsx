@@ -6,6 +6,7 @@ import App from "./App.tsx";
 import { Buffer } from "buffer";
 import { lightTheme, darkTheme, type ColorMode } from "./styles/theme";
 import { GlobalStyle } from "./styles/global";
+import { registerSW } from "virtual:pwa-register";
 
 declare global {
   interface Window {
@@ -20,6 +21,8 @@ declare global {
 if (!window.Buffer) {
   window.Buffer = Buffer;
 }
+
+registerSW();
 
 export function Root() {
   const [mode, setMode] = useState<ColorMode>(() => {
