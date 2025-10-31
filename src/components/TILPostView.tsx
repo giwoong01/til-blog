@@ -209,6 +209,18 @@ const Article = styled.article`
     background: ${({ theme }) => theme.colors.codeBg};
     color: ${({ theme }) => theme.colors.codeText};
   }
+  blockquote {
+    margin: 12px 0;
+    padding: 8px 12px;
+    border-left: 4px solid ${({ theme }) => theme.colors.border};
+    background: ${({ theme }) => theme.colors.surface};
+  }
+  blockquote > :first-child {
+    margin-top: 0;
+  }
+  blockquote > :last-child {
+    margin-bottom: 0;
+  }
   code {
     padding: 2px 4px;
     border-radius: 6px;
