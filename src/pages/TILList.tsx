@@ -68,12 +68,20 @@ export default function TILList() {
         {filtered.map((p) => (
           <Item key={p.slug}>
             <CardLink to={`/til/${p.slug}`}>
+              {p.frontmatter.date && (
+                <CardDate>{p.frontmatter.date}</CardDate>
+              )}
               <CardTitle>{p.frontmatter.title}</CardTitle>
               <CardDesc>{p.frontmatter.description}</CardDesc>
               <Tags>
-                {(p.frontmatter.tags || []).map((t: string) => (
+                {(p.frontmatter.tags || []).slice(0, 3).map((t: string) => (
                   <Tag key={t}>#{t}</Tag>
                 ))}
+                {(p.frontmatter.tags || []).length > 3 && (
+                  <TagMore>
+                    +{(p.frontmatter.tags || []).length - 3}
+                  </TagMore>
+                )}
               </Tags>
             </CardLink>
           </Item>
@@ -195,15 +203,25 @@ const CardDesc = styled.p`
   line-height: 1.5;
   min-height: calc(1.5em * 2);
 `;
+const CardDate = styled.p`
+  margin: 0 0 6px;
+  color: ${({ theme }) => theme.colors.subtleText};
+  font-size: 12px;
+`;
 const Tags = styled.div`
   margin-top: 8px;
   display: flex;
   gap: 6px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow: hidden;
 `;
 const Tag = styled.span`
   font-size: 12px;
   background: ${({ theme }) => theme.colors.chip};
   padding: 2px 6px;
   border-radius: ${({ theme }) => theme.radius.sm};
+`;
+const TagMore = styled(Tag)`
+  background: transparent;
+  border: 1px dashed ${({ theme }) => theme.colors.border};
 `;
