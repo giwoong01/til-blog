@@ -1,8 +1,8 @@
-import { useMemo, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import styled from "styled-components";
 import { usePosts } from "../posts/usePosts";
-import { HEADER_OFFSET, slugify } from "../utils/markdown";
+import { HEADER_OFFSET } from "../utils/markdown";
 import TILPostView from "../components/TILPostView";
 import TILToc, { type Heading } from "../components/TILToc";
 
@@ -11,24 +11,27 @@ export default function TILView() {
   const { posts } = usePosts();
   const post = posts.find((p) => p.slug === slug);
 
-  const tocHeadings: Heading[] = useMemo(() => {
-    const seen: Record<string, number> = {};
-    const out: Heading[] = [];
-    const content = post?.content ?? "";
-    const re = /^(#{1,4})\s+(.+)$/gm;
-    let m: RegExpExecArray | null;
-    while ((m = re.exec(content))) {
-      const level = m[1].length;
-      const text = m[2].trim();
-      const base = slugify(text);
-      const n = (seen[base] = (seen[base] || 0) + 1);
-      const id = n > 1 ? `${base}-${n}` : base;
-      out.push({ level, text, id });
-    }
-    return out;
-  }, [post?.content]);
+  const [tocHeadings, setTocHeadings] = useState<Heading[]>([]);
+  useEffect(() => {
+    const els = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        "article h1[id], article h2[id], article h3[id], article h4[id]"
+      )
+    );
+    const out: Heading[] = els.map((el) => {
+      const tag = el.tagName.toLowerCase();
+      const level = tag === "h1" ? 1 : tag === "h2" ? 2 : tag === "h3" ? 3 : 4;
+      return {
+        level,
+        text: (el.textContent || "").trim(),
+        id: el.id,
+      };
+    });
+    setTocHeadings(out);
+  }, [post?.slug]);
 
   const [activeId, setActiveId] = useState<string>("");
+  const suppressUntilRef = useRef<number>(0);
   useEffect(() => {
     const getActive = () => {
       const els = Array.from(
@@ -47,6 +50,7 @@ export default function TILView() {
       return current.id;
     };
     const onScroll = () => {
+      if (Date.now() < suppressUntilRef.current) return;
       const id = getActive();
       if (id) setActiveId(id);
     };
@@ -72,8 +76,8 @@ export default function TILView() {
   const prevPost =
     currentIndex >= 0 && currentIndex + 1 < posts.length
       ? posts[currentIndex + 1]
-      : undefined; // 이전글 = 더 오래된 글
-  const nextPost = currentIndex > 0 ? posts[currentIndex - 1] : undefined; // 다음글 = 더 최신 글
+      : undefined;
+  const nextPost = currentIndex > 0 ? posts[currentIndex - 1] : undefined;
 
   const currentTags = (post.frontmatter.tags || []).map((t) => String(t));
   const getCommonTags = (other?: string[]) => {
@@ -89,14 +93,15 @@ export default function TILView() {
     e.preventDefault();
     const el = document.getElementById(id);
     if (!el) return;
-    const y = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
-    window.scrollTo({ top: y, behavior: "smooth" });
-    const baseHash = window.location.hash.replace(/\/#[^/].*$/, "");
-    const newHash = `${baseHash}/#${encodeURIComponent(id)}`;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    suppressUntilRef.current = Date.now() + 1000;
+    setActiveId(id);
+    const pathname = window.location.pathname;
+    const search = window.location.search;
     history.replaceState(
       null,
       "",
-      `${window.location.pathname}${window.location.search}${newHash}`
+      `${pathname}${search}#${encodeURIComponent(id)}`
     );
   };
 
@@ -133,5 +138,3 @@ const MainCol = styled.div`
   max-width: 720px;
   min-width: 0;
 `;
-
-// page-level layout styles only

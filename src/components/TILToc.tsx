@@ -61,6 +61,3 @@ const TocItem = styled.li<{ $level: number; $active: boolean }>`
     padding-left: ${({ $level }) => indent($level)}px;
   }
 `;
-
-
-
