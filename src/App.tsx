@@ -4,6 +4,9 @@ import SiteHeader from "./components/Header";
 import SiteFooter from "./components/Footer";
 import TILList from "./pages/TILList.tsx";
 import TILView from "./pages/TILView.tsx";
+import About from "./pages/About.tsx";
+import Archive from "./pages/Archive.tsx";
+import TagView from "./pages/TagView.tsx";
 
 function App() {
   useLocation();
@@ -15,6 +18,9 @@ function App() {
           <Route path="/" element={<TILList />} />
           <Route path="/til" element={<TILList />} />
           <Route path="/til/:slug" element={<TILView />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/archive" element={<Archive />} />
+          <Route path="/tags/:tag" element={<TagView />} />
         </Routes>
       </Main>
       <SiteFooter />

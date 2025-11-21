@@ -64,9 +64,13 @@ function normalizeFrontmatter(data: unknown): FrontMatter {
   const d = obj.date as unknown;
   let dateStr: string | undefined = undefined;
   if (d instanceof Date) {
-    dateStr = d.toISOString().slice(0, 10);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    dateStr = `${yyyy}-${mm}-${dd}`;
   } else if (typeof d === "string") {
-    dateStr = d;
+    const m = d.match(/^(\d{4}-\d{2}-\d{2})/);
+    dateStr = m ? m[1] : d;
   }
 
   const tagsVal = obj.tags as unknown;

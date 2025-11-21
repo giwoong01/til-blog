@@ -31,6 +31,8 @@ export default function Header() {
     <Wrap>
       <BrandLink to="/">Today I Learned</BrandLink>
       <Right>
+        <TopLink to="/archive">아카이브</TopLink>
+        <TopLink to="/about">소개</TopLink>
         {profile.github && (
           <IconLink
             href={profile.github}
@@ -76,6 +78,14 @@ const BrandLink = styled(Link)`
   font-size: 20px;
   color: ${({ theme }) => theme.colors.text};
   text-decoration: none;
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  ${({ theme }) => theme.mq.sm} {
+    font-size: 16px;
+  }
 `;
 
 const Wrap = styled.header`
@@ -91,12 +101,43 @@ const Wrap = styled.header`
   border-radius: ${({ theme }) => theme.radius.md};
   background: ${({ theme }) => theme.colors.surface};
   box-shadow: ${({ theme }) => theme.shadow.sm};
+  ${({ theme }) => theme.mq.sm} {
+    gap: 8px;
+    padding: 8px 10px;
+  }
 `;
 
 const Right = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 0 0 auto;
+  ${({ theme }) => theme.mq.sm} {
+    gap: 6px;
+  }
+`;
+const TopLink = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid
+    ${({ theme }) => (theme.mode === "dark" ? "#3b455a" : theme.colors.border)};
+  border-radius: ${({ theme }) => theme.radius.sm};
+  color: ${({ theme }) => theme.colors.text};
+  text-decoration: none;
+  background: ${({ theme }) => theme.colors.surface};
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  &:hover {
+    background: ${({ theme }) => theme.colors.chip};
+  }
+  ${({ theme }) => theme.mq.sm} {
+    height: 24px;
+    padding: 0 6px;
+    font-size: 11px;
+  }
 `;
 
 const IconLink = styled.a`
@@ -114,12 +155,20 @@ const IconLink = styled.a`
   &:hover {
     background: ${({ theme }) => theme.colors.chip};
   }
+  ${({ theme }) => theme.mq.sm} {
+    width: 24px;
+    height: 24px;
+  }
 `;
 
 const Icon = styled.svg`
   width: 16px;
   height: 16px;
   fill: currentColor;
+  ${({ theme }) => theme.mq.sm} {
+    width: 14px;
+    height: 14px;
+  }
 `;
 
 const Switch = styled.button<{ $dark: boolean }>`
@@ -137,6 +186,11 @@ const Switch = styled.button<{ $dark: boolean }>`
   justify-content: space-between;
   padding: 0 8px;
   transition: background 0.2s ease;
+  ${({ theme }) => theme.mq.sm} {
+    width: 56px;
+    height: 26px;
+    padding: 0 6px;
+  }
 `;
 
 const Knob = styled.span<{ $dark: boolean }>`
@@ -148,14 +202,25 @@ const Knob = styled.span<{ $dark: boolean }>`
   border-radius: 50%;
   background: ${({ theme }) => theme.colors.knobBg};
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-  transform: ${({ $dark }) => ($dark ? "translateX(34px)" : "translateX(0)")};
+  transform: ${({ $dark }: { $dark: boolean }) =>
+    $dark ? "translateX(34px)" : "translateX(0)"};
   transition: transform 0.2s ease;
+  ${({ theme }) => theme.mq.sm} {
+    width: 20px;
+    height: 20px;
+    transform: ${({ $dark }: { $dark: boolean }) =>
+      $dark ? "translateX(30px)" : "translateX(0)"};
+  }
 `;
 
 const SunIcon = styled.svg`
   width: 16px;
   height: 16px;
   fill: currentColor;
+  ${({ theme }) => theme.mq.sm} {
+    width: 14px;
+    height: 14px;
+  }
 `;
 const MoonIcon = styled(SunIcon)``;
 
@@ -170,5 +235,9 @@ const IconWrap = styled.span`
   &[data-active="true"] {
     background: ${({ theme }) => theme.colors.chip};
     color: ${({ theme }) => theme.colors.text};
+  }
+  ${({ theme }) => theme.mq.sm} {
+    width: 18px;
+    height: 18px;
   }
 `;

@@ -55,7 +55,9 @@ export default function TILPostView({
       {post.frontmatter.date && <DateText>{post.frontmatter.date}</DateText>}
       <Tags>
         {(post.frontmatter.tags || []).map((t: string) => (
-          <Tag key={t}>#{t}</Tag>
+          <TagLink key={t} to={`/tags/${encodeURIComponent(String(t))}`}>
+            #{t}
+          </TagLink>
         ))}
       </Tags>
       <Article>
@@ -176,11 +178,14 @@ const Tags = styled.div`
   gap: 6px;
   flex-wrap: wrap;
 `;
-const Tag = styled.span`
+const TagLink = styled(Link)`
+  display: inline-block;
   font-size: 12px;
   background: ${({ theme }) => theme.colors.chip};
   padding: 2px 6px;
   border-radius: ${({ theme }) => theme.radius.sm};
+  color: ${({ theme }) => theme.colors.text};
+  text-decoration: none;
 `;
 const Article = styled.article`
   line-height: 1.75;

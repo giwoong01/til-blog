@@ -1,44 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import styled from "styled-components";
 import { usePosts } from "../posts/usePosts";
 
-export default function TILList() {
+export default function TagView() {
+  const { tag = "" } = useParams();
+  const tagValue = decodeURIComponent(tag);
   const { posts } = usePosts();
-  const [q, setQ] = useState("");
-  const [tag, setTag] = useState("");
   type SortKey = "new" | "old";
   const [sort, setSort] = useState<SortKey>("new");
-  const [searchParams, setSearchParams] = useSearchParams();
   const PAGE_SIZE = 12;
-  const [page, setPage] = useState<number>(() => {
-    const p = parseInt(searchParams.get("page") || "1", 10);
-    return Number.isFinite(p) && p > 0 ? p : 1;
-  });
-
-  useEffect(() => {
-    const p = parseInt(searchParams.get("page") || "1", 10);
-    const next = Number.isFinite(p) && p > 0 ? p : 1;
-    setPage(next);
-  }, [searchParams]);
-
-  const allTags = useMemo(() => {
-    const s = new Set<string>();
-    posts.forEach((p) => p.frontmatter.tags?.forEach((t: string) => s.add(t)));
-    return Array.from(s).sort();
-  }, [posts]);
+  const [page, setPage] = useState<number>(1);
 
   const filtered = useMemo(() => {
-    const ql = q.trim().toLowerCase();
-    const f = posts.filter((p) => {
-      const matchesQ =
-        !ql ||
-        p.frontmatter.title?.toLowerCase().includes(ql) ||
-        p.frontmatter.description?.toLowerCase().includes(ql) ||
-        p.content.toLowerCase().includes(ql);
-      const matchesTag = !tag || p.frontmatter.tags?.includes(tag);
-      return matchesQ && matchesTag;
-    });
+    const f = posts.filter((p) => p.frontmatter.tags?.includes(tagValue));
     f.sort((a, b) => {
       const ad = a.frontmatter.date
         ? new Date(a.frontmatter.date).getTime()
@@ -49,7 +24,7 @@ export default function TILList() {
       return sort === "new" ? bd - ad : ad - bd;
     });
     return f;
-  }, [posts, q, tag, sort]);
+  }, [posts, tagValue, sort]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(Math.max(1, page), totalPages);
@@ -58,47 +33,21 @@ export default function TILList() {
     return filtered.slice(start, start + PAGE_SIZE);
   }, [filtered, safePage]);
 
-  useEffect(() => {
-    setPage(1);
-    const next = new URLSearchParams(searchParams);
-    next.set("page", "1");
-    setSearchParams(next, { replace: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q, tag, sort]);
-
-  const goPage = (p: number) => {
-    const nextPage = Math.min(Math.max(1, p), totalPages);
-    setPage(nextPage);
-    const next = new URLSearchParams(searchParams);
-    next.set("page", String(nextPage));
-    setSearchParams(next);
-  };
-
   return (
     <Wrap>
-      <Controls>
-        <Input
-          placeholder="검색어"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-        />
-        <Select value={tag} onChange={(e) => setTag(e.target.value)}>
-          <option value="">전체 태그</option>
-          {allTags.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </Select>
+      <Header>
+        <Title>#{tagValue}</Title>
         <Select
           value={sort}
-          onChange={(e) => setSort(e.target.value as SortKey)}
+          onChange={(e) => {
+            setSort(e.target.value as SortKey);
+            setPage(1);
+          }}
         >
           <option value="new">최신순</option>
           <option value="old">오래된순</option>
         </Select>
-      </Controls>
-
+      </Header>
       <List>
         {paged.map((p) => (
           <Item key={p.slug}>
@@ -106,14 +55,6 @@ export default function TILList() {
               {p.frontmatter.date && <CardDate>{p.frontmatter.date}</CardDate>}
               <CardTitle>{p.frontmatter.title}</CardTitle>
               <CardDesc>{p.frontmatter.description}</CardDesc>
-              <Tags>
-                {(p.frontmatter.tags || []).slice(0, 3).map((t: string) => (
-                  <Tag key={t}>#{t}</Tag>
-                ))}
-                {(p.frontmatter.tags || []).length > 3 && (
-                  <TagMore>+{(p.frontmatter.tags || []).length - 3}</TagMore>
-                )}
-              </Tags>
             </CardLink>
           </Item>
         ))}
@@ -121,7 +62,7 @@ export default function TILList() {
       <PaginationWrap>
         <PageButton
           type="button"
-          onClick={() => goPage(page - 1)}
+          onClick={() => setPage((v) => Math.max(1, v - 1))}
           disabled={safePage <= 1}
         >
           이전
@@ -135,7 +76,7 @@ export default function TILList() {
                 key={n}
                 data-active={String(n === safePage)}
                 type="button"
-                onClick={() => goPage(n)}
+                onClick={() => setPage(n)}
               >
                 {n}
               </PageNumButton>
@@ -144,7 +85,7 @@ export default function TILList() {
         </PageNums>
         <PageButton
           type="button"
-          onClick={() => goPage(page + 1)}
+          onClick={() => setPage((v) => Math.min(totalPages, v + 1))}
           disabled={safePage >= totalPages}
         >
           다음
@@ -155,38 +96,19 @@ export default function TILList() {
 }
 
 const Wrap = styled.div``;
-
-const Controls = styled.div`
+const Header = styled.div`
   display: flex;
+  align-items: center;
   gap: 8px;
   margin-bottom: 12px;
   ${({ theme }) => theme.mq.sm} {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 8px;
   }
 `;
-const Input = styled.input`
-  padding: 10px 14px;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radius.md};
-  background: ${({ theme }) => theme.colors.surface};
-  color: ${({ theme }) => theme.colors.text};
-  min-width: 0;
-  line-height: 1.2;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-  &::placeholder {
-    color: ${({ theme }) => theme.colors.subtleText};
-  }
-  &:focus {
-    outline: none;
-    border-color: ${({ theme }) => theme.colors.text};
-    box-shadow: 0 0 0 3px rgba(27, 100, 255, 0.25);
-  }
-  ${({ theme }) => theme.mq.sm} {
-    grid-column: 1 / -1;
-    width: 100%;
-  }
+const Title = styled.h1`
+  margin: 0;
 `;
 const Select = styled.select`
   padding: 10px 38px 10px 12px;
@@ -271,24 +193,6 @@ const CardDate = styled.p`
   color: ${({ theme }) => theme.colors.subtleText};
   font-size: 12px;
 `;
-const Tags = styled.div`
-  margin-top: 8px;
-  display: flex;
-  gap: 6px;
-  flex-wrap: nowrap;
-  overflow: hidden;
-`;
-const Tag = styled.span`
-  font-size: 12px;
-  background: ${({ theme }) => theme.colors.chip};
-  padding: 2px 6px;
-  border-radius: ${({ theme }) => theme.radius.sm};
-`;
-const TagMore = styled(Tag)`
-  background: transparent;
-  border: 1px dashed ${({ theme }) => theme.colors.border};
-`;
-
 const PaginationWrap = styled.nav`
   margin-top: 16px;
   display: flex;
