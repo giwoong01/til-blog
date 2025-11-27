@@ -29,10 +29,23 @@ export default function Header() {
 
   return (
     <Wrap>
-      <BrandLink to="/">Today I Learned</BrandLink>
+      <BrandLink to="/">
+        <BrandText>Today I Learned</BrandText>
+        <BrandTextShort>TIL</BrandTextShort>
+      </BrandLink>
       <Right>
-        <TopLink to="/archive">아카이브</TopLink>
-        <TopLink to="/about">소개</TopLink>
+        <TopLink to="/archive">
+          <LinkText>아카이브</LinkText>
+          <LinkIcon viewBox="0 0 24 24" aria-hidden>
+            <path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z" />
+          </LinkIcon>
+        </TopLink>
+        <TopLinkExternal href="/portfolio/" target="_blank" rel="noreferrer">
+          <LinkText>포트폴리오</LinkText>
+          <LinkIcon viewBox="0 0 24 24" aria-hidden>
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+          </LinkIcon>
+        </TopLinkExternal>
         {profile.github && (
           <IconLink
             href={profile.github}
@@ -88,6 +101,19 @@ const BrandLink = styled(Link)`
   }
 `;
 
+const BrandText = styled.span`
+  ${({ theme }) => theme.mq.sm} {
+    display: none;
+  }
+`;
+
+const BrandTextShort = styled.span`
+  display: none;
+  ${({ theme }) => theme.mq.sm} {
+    display: inline;
+  }
+`;
+
 const Wrap = styled.header`
   position: sticky;
   top: 0;
@@ -119,6 +145,48 @@ const Right = styled.div`
 const TopLink = styled(Link)`
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid
+    ${({ theme }) => (theme.mode === "dark" ? "#3b455a" : theme.colors.border)};
+  border-radius: ${({ theme }) => theme.radius.sm};
+  color: ${({ theme }) => theme.colors.text};
+  text-decoration: none;
+  background: ${({ theme }) => theme.colors.surface};
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  &:hover {
+    background: ${({ theme }) => theme.colors.chip};
+  }
+  ${({ theme }) => theme.mq.sm} {
+    height: 24px;
+    padding: 0 6px;
+    font-size: 11px;
+  }
+`;
+
+const LinkText = styled.span`
+  ${({ theme }) => theme.mq.sm} {
+    display: none;
+  }
+`;
+
+const LinkIcon = styled.svg`
+  display: none;
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  ${({ theme }) => theme.mq.sm} {
+    display: block;
+  }
+`;
+
+const TopLinkExternal = styled.a`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   height: 28px;
   padding: 0 10px;
   border: 1px solid
