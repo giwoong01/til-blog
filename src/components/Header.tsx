@@ -40,12 +40,12 @@ export default function Header() {
             <path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z" />
           </LinkIcon>
         </TopLink>
-        <TopLinkExternal href="/portfolio/" target="_blank" rel="noreferrer">
+        {/* <TopLink to="/portfolio">
           <LinkText>포트폴리오</LinkText>
           <LinkIcon viewBox="0 0 24 24" aria-hidden>
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
           </LinkIcon>
-        </TopLinkExternal>
+        </TopLink> */}
         {profile.github && (
           <IconLink
             href={profile.github}
@@ -183,30 +183,9 @@ const LinkIcon = styled.svg`
   }
 `;
 
-const TopLinkExternal = styled.a`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 28px;
-  padding: 0 10px;
-  border: 1px solid
-    ${({ theme }) => (theme.mode === "dark" ? "#3b455a" : theme.colors.border)};
-  border-radius: ${({ theme }) => theme.radius.sm};
-  color: ${({ theme }) => theme.colors.text};
-  text-decoration: none;
-  background: ${({ theme }) => theme.colors.surface};
-  font-size: 12px;
-  line-height: 1;
-  white-space: nowrap;
-  &:hover {
-    background: ${({ theme }) => theme.colors.chip};
-  }
-  ${({ theme }) => theme.mq.sm} {
-    height: 24px;
-    padding: 0 6px;
-    font-size: 11px;
-  }
-`;
+
+
+
 
 const IconLink = styled.a`
   display: inline-flex;
@@ -277,7 +256,7 @@ const Knob = styled.span<{ $dark: boolean }>`
     width: 20px;
     height: 20px;
     transform: ${({ $dark }: { $dark: boolean }) =>
-      $dark ? "translateX(30px)" : "translateX(0)"};
+    $dark ? "translateX(30px)" : "translateX(0)"};
   }
 `;
 
