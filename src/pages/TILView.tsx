@@ -3,13 +3,16 @@ import { useParams, Link } from "react-router-dom";
 import styled from "styled-components";
 import { usePosts } from "../posts/usePosts";
 import { HEADER_OFFSET } from "../utils/markdown";
+import { TOC_SCROLL_SUPPRESS_MS } from "../constants";
 import TILPostView from "../components/TILPostView";
 import TILToc, { type Heading } from "../components/TILToc";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 export default function TILView() {
   const { slug = "" } = useParams();
   const { posts } = usePosts();
   const post = posts.find((p) => p.slug === slug);
+  usePageTitle(post ? `${post.frontmatter.title} | TIL` : "TIL Blog");
 
   const [tocHeadings, setTocHeadings] = useState<Heading[]>([]);
   useEffect(() => {
@@ -94,7 +97,7 @@ export default function TILView() {
     const el = document.getElementById(id);
     if (!el) return;
     el.scrollIntoView({ behavior: "smooth", block: "start" });
-    suppressUntilRef.current = Date.now() + 1000;
+    suppressUntilRef.current = Date.now() + TOC_SCROLL_SUPPRESS_MS;
     setActiveId(id);
     const pathname = window.location.pathname;
     const search = window.location.search;

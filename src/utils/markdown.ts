@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
-
-export const HEADER_OFFSET = 140;
+export { HEADER_OFFSET } from "../constants";
 
 export const slugify = (text: string): string => {
   const base = text

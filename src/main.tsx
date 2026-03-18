@@ -8,15 +8,6 @@ import { lightTheme, darkTheme, type ColorMode } from "./styles/theme";
 import { GlobalStyle } from "./styles/global";
 import { registerSW } from "virtual:pwa-register";
 
-declare global {
-  interface Window {
-    Buffer?: typeof Buffer;
-    __toggleColorMode?: () => void;
-    __getColorMode?: () => "light" | "dark";
-    __setColorMode?: (m: ColorMode) => void;
-    __getColorModeRaw?: () => ColorMode;
-  }
-}
 
 if (!window.Buffer) {
   window.Buffer = Buffer;

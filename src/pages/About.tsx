@@ -1,7 +1,9 @@
 import styled from "styled-components";
 import { profile } from "../profile";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 export default function About() {
+  usePageTitle("About | TIL");
   return (
     <Wrap>
       <Title>소개</Title>

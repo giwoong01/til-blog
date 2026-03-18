@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { COPY_FEEDBACK_DURATION } from "../constants";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -6,6 +7,8 @@ import rehypeHighlight from "rehype-highlight";
 import styled from "styled-components";
 import type { Post } from "../posts/usePosts";
 import { HEADER_OFFSET, slugify, getTextFromChildren } from "../utils/markdown";
+import { readingTime } from "../utils/readingTime";
+import CodeBlock from "./CodeBlock";
 
 type Props = {
   post: Post;
@@ -38,6 +41,7 @@ export default function TILPostView({
     h2: makeHeading("h2"),
     h3: makeHeading("h3"),
     h4: makeHeading("h4"),
+    code: CodeBlock,
     img: (props: React.ImgHTMLAttributes<HTMLImageElement>) => {
       const raw = props.src || "";
       const base = import.meta.env.BASE_URL || "/";
@@ -52,7 +56,10 @@ export default function TILPostView({
     <>
       <Back to="/til">← 목록</Back>
       <Title>{post.frontmatter.title}</Title>
-      {post.frontmatter.date && <DateText>{post.frontmatter.date}</DateText>}
+      <Meta>
+        {post.frontmatter.date && <DateText>{post.frontmatter.date}</DateText>}
+        <ReadingTime>약 {readingTime(post.content)}분</ReadingTime>
+      </Meta>
       <Tags>
         {(post.frontmatter.tags || []).map((t: string) => (
           <TagLink key={t} to={`/tags/${encodeURIComponent(String(t))}`}>
@@ -137,7 +144,7 @@ export default function TILPostView({
             try {
               await navigator.clipboard.writeText(shareUrl);
               setCopied(true);
-              setTimeout(() => setCopied(false), 1500);
+              setTimeout(() => setCopied(false), COPY_FEEDBACK_DURATION);
             } catch {
               // ignore
             }
@@ -168,9 +175,21 @@ const Title = styled.h1`
     font-size: 32px;
   }
 `;
+const Meta = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: -8px;
+`;
+
 const DateText = styled.p`
   color: ${({ theme }) => theme.colors.subtleText};
-  margin-top: -8px;
+  margin: 0;
+`;
+
+const ReadingTime = styled.span`
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.subtleText};
 `;
 const Tags = styled.div`
   margin: 12px 0;

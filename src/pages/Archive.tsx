@@ -2,12 +2,15 @@ import { useMemo, useState } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { usePosts } from "../posts/usePosts";
+import { usePageTitle } from "../hooks/usePageTitle";
+import { ALL_KEY, isMonthKey, formatMonth } from "../utils/archive";
+import ArchiveSidebar from "../components/archive/ArchiveSidebar";
+import ArchiveCalendar from "../components/archive/ArchiveCalendar";
 
 type MonthKey = string; // YYYY-MM
-const isMonthKey = (key: string) => /^\d{4}-\d{2}$/.test(key);
-const ALL_KEY = "전체";
 
 export default function Archive() {
+  usePageTitle("Archive | TIL");
   const { posts } = usePosts();
 
   const byMonth = useMemo(() => {
@@ -92,38 +95,17 @@ export default function Archive() {
 
   return (
     <Wrap>
-      <Sidebar>
-        <h2>아카이브</h2>
-        <MonthList>
-          <MonthItem key={ALL_KEY}>
-            <MonthButton
-              type="button"
-              data-active={String(selected === ALL_KEY)}
-              onClick={() => {
-                setSelected(ALL_KEY);
-                setView("list");
-              }}
-            >
-              <span>{ALL_KEY}</span>
-              <Count>{posts.length}</Count>
-            </MonthButton>
-          </MonthItem>
-          {months.map((m) => (
-            <MonthItem key={m}>
-              <MonthButton
-                type="button"
-                data-active={String(m === selected)}
-                onClick={() => setSelected(m)}
-              >
-                <span>{formatMonth(m)}</span>
-                <Count>
-                  {byMonth.find((g) => g.key === m)?.items.length || 0}
-                </Count>
-              </MonthButton>
-            </MonthItem>
-          ))}
-        </MonthList>
-      </Sidebar>
+      <ArchiveSidebar
+        months={months}
+        byMonth={byMonth}
+        totalPosts={posts.length}
+        selected={selected}
+        onSelect={setSelected}
+        onSelectAll={() => {
+          setSelected(ALL_KEY);
+          setView("list");
+        }}
+      />
       <Main>
         <MainHeader>
           <Title>
@@ -213,40 +195,14 @@ export default function Archive() {
 
         {view === "calendar" && (
           <>
-            <Calendar>
-              <WeekHeader>
-                {["일", "월", "화", "수", "목", "금", "토"].map((w) => (
-                  <span key={w}>{w}</span>
-                ))}
-              </WeekHeader>
-              <Grid>
-                {Array.from({ length: Math.max(0, startDay) }).map((_, i) => (
-                  <Spacer key={`s-${i}`} />
-                ))}
-                {Array.from({ length: daysInSelected }, (_, i) => i + 1).map(
-                  (d) => {
-                    const list = byDayInMonth.get(d) || [];
-                    const fullDate =
-                      selected && /^\d{4}-\d{2}$/.test(selected)
-                        ? `${selected}-${String(d).padStart(2, "0")}`
-                        : "";
-                    const isActive = activeDate === fullDate;
-                    return (
-                      <DayCell
-                        key={d}
-                        type="button"
-                        data-active={String(isActive)}
-                        data-has={String(list.length > 0)}
-                        onClick={() => setActiveDate(fullDate)}
-                      >
-                        <DayNum>{d}</DayNum>
-                        {list.length > 0 && <Badge>{list.length}</Badge>}
-                      </DayCell>
-                    );
-                  }
-                )}
-              </Grid>
-            </Calendar>
+            <ArchiveCalendar
+              startDay={startDay}
+              daysInSelected={daysInSelected}
+              byDayInMonth={byDayInMonth}
+              selected={selected}
+              activeDate={activeDate}
+              onDayClick={setActiveDate}
+            />
             {activeDate && (
               <DayList>
                 <h3>{activeDate}의 글</h3>
@@ -272,13 +228,6 @@ export default function Archive() {
   );
 }
 
-function formatMonth(key: string): string {
-  if (key === "기타") return "기타";
-  const m = key.match(/^(\d{4})-(\d{2})$/);
-  if (!m) return key;
-  return `${m[1]}년 ${parseInt(m[2], 10)}월`;
-}
-
 const Wrap = styled.div`
   display: grid;
   grid-template-columns: 240px 1fr;
@@ -287,50 +236,6 @@ const Wrap = styled.div`
   ${({ theme }) => theme.mq.md} {
     grid-template-columns: 1fr;
   }
-`;
-const Sidebar = styled.aside`
-  position: sticky;
-  top: 80px;
-  z-index: 2;
-  align-self: start;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radius.md};
-  background: ${({ theme }) => theme.colors.surface};
-  box-shadow: ${({ theme }) => theme.shadow.sm};
-  padding: 12px;
-  h2 {
-    margin: 4px 0 8px;
-    font-size: 18px;
-  }
-`;
-const MonthList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 6px;
-`;
-const MonthItem = styled.li``;
-const MonthButton = styled.button`
-  width: 100%;
-  text-align: left;
-  padding: 8px 10px;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radius.md};
-  background: ${({ theme }) => theme.colors.surface};
-  color: ${({ theme }) => theme.colors.text};
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  cursor: pointer;
-  &[data-active="true"] {
-    background: ${({ theme }) => theme.colors.chip};
-    font-weight: 700;
-  }
-`;
-const Count = styled.span`
-  color: ${({ theme }) => theme.colors.subtleText};
 `;
 const Main = styled.section`
   min-width: 0;
@@ -420,57 +325,6 @@ const ToggleBtn = styled.button`
     background: ${({ theme }) => theme.colors.chip};
     font-weight: 700;
   }
-`;
-
-const Calendar = styled.section`
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radius.md};
-  background: ${({ theme }) => theme.colors.surface};
-  box-shadow: ${({ theme }) => theme.shadow.sm};
-  padding: 12px;
-`;
-const WeekHeader = styled.div`
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  text-align: center;
-  color: ${({ theme }) => theme.colors.subtleText};
-  margin-bottom: 6px;
-`;
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-`;
-const Spacer = styled.div``;
-const DayCell = styled.button`
-  position: relative;
-  min-height: 64px;
-  text-align: left;
-  padding: 8px;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radius.sm};
-  background: ${({ theme }) => theme.colors.surface};
-  color: ${({ theme }) => theme.colors.text};
-  cursor: pointer;
-  &[data-has="true"] {
-    background: ${({ theme }) => theme.colors.surface};
-  }
-  &[data-active="true"] {
-    outline: 2px solid ${({ theme }) => theme.colors.text};
-    outline-offset: -2px;
-  }
-`;
-const DayNum = styled.span`
-  font-weight: 600;
-`;
-const Badge = styled.span`
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  font-size: 11px;
-  padding: 2px 6px;
-  border-radius: ${({ theme }) => theme.radius.sm};
-  background: ${({ theme }) => theme.colors.chip};
 `;
 const DayList = styled.section`
   margin-top: 12px;

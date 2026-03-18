@@ -5,14 +5,7 @@ import { useEffect, useState } from "react";
 
 export default function Header() {
   const [mode, setMode] = useState<string>(
-    () =>
-      (
-        window as unknown as { __getColorModeRaw?: () => string }
-      ).__getColorModeRaw?.() ||
-      (
-        window as unknown as { __getColorMode?: () => string }
-      ).__getColorMode?.() ||
-      "light"
+    () => window.__getColorModeRaw?.() || window.__getColorMode?.() || "light"
   );
 
   useEffect(() => {
@@ -40,6 +33,12 @@ export default function Header() {
             <path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z" />
           </LinkIcon>
         </TopLink>
+        <TopLink to="/stats">
+          <LinkText>통계</LinkText>
+          <LinkIcon viewBox="0 0 24 24" aria-hidden>
+            <path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z" />
+          </LinkIcon>
+        </TopLink>
         {/* <TopLink to="/portfolio">
           <LinkText>포트폴리오</LinkText>
           <LinkIcon viewBox="0 0 24 24" aria-hidden>
@@ -63,11 +62,7 @@ export default function Header() {
           aria-label="Toggle theme"
           aria-checked={isDark}
           $dark={isDark}
-          onClick={() =>
-            (
-              window as unknown as { __toggleColorMode?: () => void }
-            ).__toggleColorMode?.()
-          }
+          onClick={() => window.__toggleColorMode?.()}
         >
           <IconWrap data-active={String(!isDark)}>
             <SunIcon viewBox="0 0 24 24" aria-hidden>

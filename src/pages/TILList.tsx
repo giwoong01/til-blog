@@ -1,16 +1,29 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import { usePosts } from "../posts/usePosts";
+import { PAGE_SIZE } from "../constants";
+import { usePageTitle } from "../hooks/usePageTitle";
+import { SelectInput } from "../components/shared/SelectInput";
+import {
+  List,
+  Item,
+  CardLink,
+  CardTitle,
+  CardDesc,
+  CardDate,
+} from "../components/shared/PostCardList";
+import Pagination from "../components/shared/Pagination";
+
+type SortKey = "new" | "old";
 
 export default function TILList() {
+  usePageTitle("TIL Blog");
   const { posts } = usePosts();
   const [q, setQ] = useState("");
   const [tag, setTag] = useState("");
-  type SortKey = "new" | "old";
   const [sort, setSort] = useState<SortKey>("new");
   const [searchParams, setSearchParams] = useSearchParams();
-  const PAGE_SIZE = 12;
   const [page, setPage] = useState<number>(() => {
     const p = parseInt(searchParams.get("page") || "1", 10);
     return Number.isFinite(p) && p > 0 ? p : 1;
@@ -82,21 +95,21 @@ export default function TILList() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
-        <Select value={tag} onChange={(e) => setTag(e.target.value)}>
+        <SelectInput value={tag} onChange={(e) => setTag(e.target.value)}>
           <option value="">전체 태그</option>
           {allTags.map((t) => (
             <option key={t} value={t}>
               {t}
             </option>
           ))}
-        </Select>
-        <Select
+        </SelectInput>
+        <SelectInput
           value={sort}
           onChange={(e) => setSort(e.target.value as SortKey)}
         >
           <option value="new">최신순</option>
           <option value="old">오래된순</option>
-        </Select>
+        </SelectInput>
       </Controls>
 
       <List>
@@ -118,38 +131,11 @@ export default function TILList() {
           </Item>
         ))}
       </List>
-      <PaginationWrap>
-        <PageButton
-          type="button"
-          onClick={() => goPage(page - 1)}
-          disabled={safePage <= 1}
-        >
-          이전
-        </PageButton>
-        <PageNums>
-          {makePageRange(safePage, totalPages).map((n, idx) =>
-            n === -1 ? (
-              <Ellipsis key={`e-${idx}`}>…</Ellipsis>
-            ) : (
-              <PageNumButton
-                key={n}
-                data-active={String(n === safePage)}
-                type="button"
-                onClick={() => goPage(n)}
-              >
-                {n}
-              </PageNumButton>
-            )
-          )}
-        </PageNums>
-        <PageButton
-          type="button"
-          onClick={() => goPage(page + 1)}
-          disabled={safePage >= totalPages}
-        >
-          다음
-        </PageButton>
-      </PaginationWrap>
+      <Pagination
+        safePage={safePage}
+        totalPages={totalPages}
+        onPage={goPage}
+      />
     </Wrap>
   );
 }
@@ -188,89 +174,6 @@ const Input = styled.input`
     width: 100%;
   }
 `;
-const Select = styled.select`
-  padding: 10px 38px 10px 12px;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radius.md};
-  background: ${({ theme }) => theme.colors.surface};
-  color: ${({ theme }) => theme.colors.text};
-  width: 180px;
-  flex: 0 0 180px;
-  line-height: 1.2;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 14px 14px;
-  background-image: ${({ theme }) =>
-    `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='${encodeURIComponent(
-      theme.colors.subtleText
-    )}'><path d='M7 10l5 5 5-5'/></svg>")`};
-  &:focus {
-    outline: none;
-    border-color: ${({ theme }) => theme.colors.text};
-    box-shadow: 0 0 0 3px rgba(27, 100, 255, 0.25);
-  }
-  ${({ theme }) => theme.mq.sm} {
-    width: 100%;
-    flex: initial;
-  }
-`;
-const List = styled.ul`
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(3, 1fr);
-  ${({ theme }) => theme.mq.md} {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  ${({ theme }) => theme.mq.sm} {
-    grid-template-columns: 1fr;
-  }
-`;
-const Item = styled.li`
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radius.md};
-  background: ${({ theme }) => theme.colors.surface};
-  box-shadow: ${({ theme }) => theme.shadow.sm};
-`;
-const CardLink = styled(Link)`
-  display: block;
-  padding: 16px;
-  color: ${({ theme }) => theme.colors.text};
-  text-decoration: none;
-`;
-const CardTitle = styled.h3`
-  margin: 0 0 6px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-break: break-word;
-  line-height: 1.4;
-  min-height: calc(1.4em * 2);
-`;
-const CardDesc = styled.p`
-  margin: 0;
-  color: ${({ theme }) => theme.colors.subtleText};
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-break: break-word;
-  line-height: 1.5;
-  min-height: calc(1.5em * 2);
-`;
-const CardDate = styled.p`
-  margin: 0 0 6px;
-  color: ${({ theme }) => theme.colors.subtleText};
-  font-size: 12px;
-`;
 const Tags = styled.div`
   margin-top: 8px;
   display: flex;
@@ -288,52 +191,3 @@ const TagMore = styled(Tag)`
   background: transparent;
   border: 1px dashed ${({ theme }) => theme.colors.border};
 `;
-
-const PaginationWrap = styled.nav`
-  margin-top: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
-`;
-const PageButton = styled.button`
-  padding: 8px 10px;
-  border-radius: ${({ theme }) => theme.radius.md};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  background: ${({ theme }) => theme.colors.surface};
-  color: ${({ theme }) => theme.colors.text};
-  cursor: pointer;
-  &:disabled {
-    opacity: 0.5;
-    cursor: default;
-  }
-`;
-const PageNums = styled.div`
-  display: inline-flex;
-  gap: 6px;
-  align-items: center;
-`;
-const PageNumButton = styled(PageButton)`
-  &[data-active="true"] {
-    background: ${({ theme }) => theme.colors.chip};
-    font-weight: 700;
-  }
-`;
-const Ellipsis = styled.span`
-  color: ${({ theme }) => theme.colors.subtleText};
-`;
-
-function makePageRange(current: number, total: number): number[] {
-  const delta = 1;
-  const range: number[] = [];
-  const left = Math.max(1, current - delta);
-  const right = Math.min(total, current + delta);
-  const add = (n: number) => range.push(n);
-  if (left > 1) add(1);
-  if (left > 2) range.push(-1);
-  for (let n = left; n <= right; n++) add(n);
-  if (right < total - 1) range.push(-1);
-  if (right < total) add(total);
-  return range;
-}

@@ -7,6 +7,8 @@ import TILView from "./pages/TILView.tsx";
 import About from "./pages/About.tsx";
 import Archive from "./pages/Archive.tsx";
 import TagView from "./pages/TagView.tsx";
+import Stats from "./pages/Stats.tsx";
+import BackToTop from "./components/BackToTop";
 
 function App() {
   useLocation();
@@ -21,9 +23,11 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/archive" element={<Archive />} />
           <Route path="/tags/:tag" element={<TagView />} />
+          <Route path="/stats" element={<Stats />} />
         </Routes>
       </Main>
       <SiteFooter />
+      <BackToTop />
     </Layout>
   );
 }
